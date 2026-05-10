@@ -21,10 +21,6 @@
     .player {
       --team-color: var(--color-new-t);
     }
-    .player .player_data .top_row .player-stats .statistics .roundkills {
-      left: -9px;
-      right: auto;
-    }
     .player .hp_bar,
     .obs_slot {
       background-color: var(--color-new-t);
@@ -54,8 +50,8 @@
             }
           }
           .roundkills {
-            left: -9px;
-            right: auto;
+            right: -9px;
+            left: auto;
             top: -8px;
           }
         }
@@ -110,8 +106,8 @@
             }
           }
           .roundkills {
-            right: -9px;
-            left: auto;
+            left: -9px;
+            right: auto;
             top: -8px;
           }
         }

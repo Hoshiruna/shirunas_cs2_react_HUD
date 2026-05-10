@@ -22,6 +22,7 @@ dist-ssr
 *.ntvs*
 *.njsproj
 *.sln
+*.zip
 *.sw?
 src/HUD/Radar2
 build
