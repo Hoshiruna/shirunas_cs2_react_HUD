@@ -4,6 +4,7 @@ import TeamScore from "./TeamScore";
 import Bomb from "./../Timers/BombTimer";
 import { useBombTimer } from "./../Timers/Countdown";
 import { Match } from "./../../API/types";
+import { getDisplayTeams } from "../displayState";
 
 function stringToClock(time: string | number, pad = true) {
   if (typeof time === "string") {
@@ -44,8 +45,7 @@ const getRoundLabel = (mapRound: number) => {
 const Matchbar = (props: IProps) => {
   const { bomb, match, map, phase } = props;
   const time = stringToClock(phase.phase_ends_in);
-  const left = map.team_ct.orientation === "left" ? map.team_ct : map.team_t;
-  const right = map.team_ct.orientation === "left" ? map.team_t : map.team_ct;
+  const { left, right } = getDisplayTeams(map, match);
   const isPlanted =
     bomb && (bomb.state === "defusing" || bomb.state === "planted");
   const bo = (match && Number(match.matchType.substr(-1))) || 0;

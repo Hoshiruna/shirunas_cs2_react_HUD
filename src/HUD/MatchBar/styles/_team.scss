@@ -3,8 +3,8 @@
     width: 293px;
     display: flex;
     align-items: center;
-    --matchbar-logo-gradient-from: transparent;
-    --matchbar-logo-gradient-to: transparent;
+    --matchbar-logo-base-color: #12191f;
+    --matchbar-logo-tint-color: transparent;
 
     .logo {
       display: flex;
@@ -14,16 +14,25 @@
       align-items: center;
       overflow: hidden;
       justify-content: center;
+      position: relative;
+      background: var(--matchbar-logo-base-color);
+      isolation: isolate;
+
+      &::before {
+        content: "";
+        position: absolute;
+        inset: 0;
+        opacity: 0.34;
+        pointer-events: none;
+        z-index: 0;
+      }
 
       img {
         max-width: 76%;
         max-height: 76%;
         object-fit: contain;
-      }
-
-      &.CT,
-      &.T {
-        background: transparent;
+        position: relative;
+        z-index: 1;
       }
     }
 
@@ -41,11 +50,15 @@
 
       .logo {
         border-radius: 0;
-        background: linear-gradient(
-          90deg,
-          var(--matchbar-logo-gradient-from) 0%,
-          var(--matchbar-logo-gradient-to) 100%
-        );
+
+        &::before {
+          background: linear-gradient(
+            90deg,
+            var(--matchbar-logo-tint-color) 0%,
+            rgba(18, 25, 31, 0.2) 72%,
+            rgba(18, 25, 31, 0) 100%
+          );
+        }
       }
     }
 
@@ -63,11 +76,15 @@
 
       .logo {
         border-radius: 0;
-        background: linear-gradient(
-          270deg,
-          var(--matchbar-logo-gradient-from) 0%,
-          var(--matchbar-logo-gradient-to) 100%
-        );
+
+        &::before {
+          background: linear-gradient(
+            270deg,
+            var(--matchbar-logo-tint-color) 0%,
+            rgba(18, 25, 31, 0.2) 72%,
+            rgba(18, 25, 31, 0) 100%
+          );
+        }
       }
     }
   }

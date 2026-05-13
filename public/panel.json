@@ -64,6 +64,16 @@
                 "label":"Right box's image logo"
             },
             {
+                "type": "text",
+                "name": "matchbar_left_logo_background_color",
+                "label": "Matchbar left logo background color"
+            },
+            {
+                "type": "text",
+                "name": "matchbar_right_logo_background_color",
+                "label": "Matchbar right logo background color"
+            },
+            {
                 "type":"select",
                 "name":"replace_avatars",
                 "label":"Use team logos as player avatars",

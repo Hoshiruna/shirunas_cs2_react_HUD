@@ -84,6 +84,11 @@ export interface Veto {
   side: "CT" | "T" | "NO";
   type: "ban" | "pick" | "decider";
   reverseSide?: boolean;
+  hudReverseSide?: boolean;
+  gsiSideOverride?: boolean;
+  gsiLeftSide?: "CT" | "T";
+  leftSide?: "CT" | "T" | null;
+  rightSide?: "CT" | "T" | null;
   rounds?: (RoundData | null)[],
   score?: {
     [key: string]: number;

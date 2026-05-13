@@ -16,6 +16,7 @@ import Timeout from "../PauseTimeout/Timeout";
 import { CSGO } from "csgogsi";
 import { Match } from "../../API/types";
 import { useAction } from "../../API/contexts/actions";
+import { getDisplayState } from "../displayState";
 interface Props {
   game: CSGO;
   match: Match | null;
@@ -39,21 +40,8 @@ const Layout = ({ game, match }: Props) => {
     }
   });
 
-  const left =
-    game.map.team_ct.orientation === "left"
-      ? game.map.team_ct
-      : game.map.team_t;
-  const right =
-    game.map.team_ct.orientation === "left"
-      ? game.map.team_t
-      : game.map.team_ct;
-
-  const leftPlayers = game.players.filter(
-    (player) => player.team.side === left.side
-  );
-  const rightPlayers = game.players.filter(
-    (player) => player.team.side === right.side
-  );
+  const { left, right, leftPlayers, rightPlayers, players, currentPlayer } =
+    getDisplayState(game, match);
   const isFreezetime =
     (game.round && game.round.phase === "freezetime") ||
     game.phase_countdowns.phase === "freezetime";
@@ -84,19 +72,19 @@ const Layout = ({ game, match }: Props) => {
       <Timeout map={game.map} phase={game.phase_countdowns} />
       {/* <Tournament /> */}
 
-      <Observed player={game.player} />
+      <Observed player={currentPlayer} />
 
       <TeamBox
         team={left}
         players={leftPlayers}
         side="left"
-        current={game.player}
+        current={currentPlayer}
       />
       <TeamBox
         team={right}
         players={rightPlayers}
         side="right"
-        current={game.player}
+        current={currentPlayer}
       />
 
       <Trivia />
@@ -110,7 +98,7 @@ const Layout = ({ game, match }: Props) => {
       <div className={"boxes left"}>
         <UtilityLevel
           side={left.side}
-          players={game.players}
+          players={players}
           show={isFreezetime && !forceHide}
         />
         <SideBox side="left" hide={forceHide} />
@@ -130,7 +118,7 @@ const Layout = ({ game, match }: Props) => {
       <div className={"boxes right"}>
         <UtilityLevel
           side={right.side}
-          players={game.players}
+          players={players}
           show={isFreezetime && !forceHide}
         />
         <SideBox side="right" hide={forceHide} />

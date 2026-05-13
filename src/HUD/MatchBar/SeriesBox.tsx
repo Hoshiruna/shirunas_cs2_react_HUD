@@ -1,5 +1,6 @@
 import * as I from "csgogsi";
 import { Match } from "../../API/types";
+import { getDisplayTeams } from "../displayState";
 
 interface Props {
   map: I.Map;
@@ -10,8 +11,7 @@ const SeriesBox = ({ map, match }: Props) => {
   const amountOfMaps =
     (match && Math.floor(Number(match.matchType.substr(-1)) / 2) + 1) || 0;
   const bo = (match && Number(match.matchType.substr(-1))) || 0;
-  const left = map.team_ct.orientation === "left" ? map.team_ct : map.team_t;
-  const right = map.team_ct.orientation === "left" ? map.team_t : map.team_ct;
+  const { left, right } = getDisplayTeams(map, match);
   return (
     <div id="encapsulator">
       <div className="container left">
