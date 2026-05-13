@@ -1,0 +1,117 @@
+#matchbar {
+  .team {
+    width: 293px;
+    display: flex;
+    align-items: center;
+    --matchbar-logo-gradient-from: transparent;
+    --matchbar-logo-gradient-to: transparent;
+
+    .logo {
+      display: flex;
+      flex-direction: row;
+      width: 86px;
+      height: 84px;
+      align-items: center;
+      overflow: hidden;
+      justify-content: center;
+
+      img {
+        max-width: 76%;
+        max-height: 76%;
+        object-fit: contain;
+      }
+
+      &.CT,
+      &.T {
+        background: transparent;
+      }
+    }
+
+    &.left {
+      justify-content: center;
+      flex-direction: row-reverse;
+
+      .team-name {
+        align-items: flex-start;
+
+        span {
+          text-align: left;
+        }
+      }
+
+      .logo {
+        border-radius: 0;
+        background: linear-gradient(
+          90deg,
+          var(--matchbar-logo-gradient-from) 0%,
+          var(--matchbar-logo-gradient-to) 100%
+        );
+      }
+    }
+
+    &.right {
+      justify-content: center;
+      flex-direction: row;
+
+      .team-name {
+        align-items: flex-end;
+
+        span {
+          text-align: right;
+        }
+      }
+
+      .logo {
+        border-radius: 0;
+        background: linear-gradient(
+          270deg,
+          var(--matchbar-logo-gradient-from) 0%,
+          var(--matchbar-logo-gradient-to) 100%
+        );
+      }
+    }
+  }
+
+  .team-name {
+    display: flex;
+    flex-direction: column;
+    gap: 3px;
+    width: 208px;
+    height: 84px;
+    align-items: center;
+    justify-content: center;
+    font-weight: 800;
+    font-size: 20px;
+    line-height: 21px;
+    color: white;
+    background: transparent;
+
+    span {
+      max-width: 188px;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+  }
+
+  .series-dots {
+    display: flex;
+    gap: 5px;
+    height: 11px;
+    align-items: center;
+
+    span {
+      width: 11px;
+      height: 11px;
+      border-radius: 50%;
+      box-sizing: border-box;
+      border: 2px solid rgba(184, 201, 213, 0.55);
+      background: transparent;
+
+      &.won {
+        border-color: rgba(255, 255, 255, 0.95);
+        background: rgba(255, 255, 255, 0.95);
+      }
+    }
+  }
+}

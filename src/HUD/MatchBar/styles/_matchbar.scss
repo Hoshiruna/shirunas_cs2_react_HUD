@@ -1,0 +1,55 @@
+#matchbar {
+  display: flex;
+  flex-direction: row;
+  position: fixed;
+  justify-content: center;
+  align-items: stretch;
+  width: 750px;
+  height: 85px;
+  top: 20px;
+  left: 50%;
+  transform: translateX(-50%);
+  overflow: hidden;
+  border-radius: 0 0 4px 4px;
+  background: linear-gradient(180deg, #1d262d 0%, #12191f 100%);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.35);
+
+  .CT {
+    color: var(--color-new-ct);
+
+    .round-thingy {
+      background-color: #28abff80;
+
+      .inner {
+        background-color: #28abff;
+      }
+    }
+  }
+
+  .T {
+    color: var(--color-new-t);
+
+    .round-thingy {
+      background-color: #ffc60080;
+
+      .inner {
+        background-color: #ffc600;
+      }
+    }
+  }
+
+  .bar {
+    display: flex;
+    flex-direction: row;
+    width: 10px;
+    height: 70px;
+
+    &.CT {
+      background-color: var(--color-new-ct);
+    }
+
+    &.T {
+      background-color: var(--color-new-t);
+    }
+  }
+}

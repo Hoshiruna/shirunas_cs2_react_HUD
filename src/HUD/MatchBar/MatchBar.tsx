@@ -1,5 +1,5 @@
 import * as I from "csgogsi";
-import "./matchbar.scss";
+import "./styles/index.scss";
 import TeamScore from "./TeamScore";
 import Bomb from "./../Timers/BombTimer";
 import { useBombTimer } from "./../Timers/Countdown";

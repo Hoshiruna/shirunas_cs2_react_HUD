@@ -3,6 +3,17 @@ import * as I from "../../API/types";
 import { apiUrl } from "./../../API";
 import { LogoCT, LogoT } from "../../assets/Icons";
 
+type TeamLogoTeam = Team | I.Team;
+
+const getTeamId = (team: TeamLogoTeam) => {
+  if ("_id" in team) return team._id;
+  if ("id" in team && team.id) return team.id;
+  return "";
+};
+
+const getFallbackLogo = (team: TeamLogoTeam) =>
+  "side" in team && team.side === "CT" ? LogoCT : LogoT;
+
 const TeamLogo = ({
   team,
   height,
@@ -13,13 +24,9 @@ const TeamLogo = ({
   width?: number;
 }) => {
   if (!team) return null;
-  let id = "";
+
+  const id = getTeamId(team);
   const { logo } = team;
-  if ("_id" in team) {
-    id = team._id;
-  } else if ("id" in team && team.id) {
-    id = team.id;
-  }
   // ${apiUrl}/teams/${id}/logo - Old way of getting the logo
   return (
     <div className={`logo ${"side" in team ? team.side : ""}`}>
@@ -32,7 +39,7 @@ const TeamLogo = ({
         />
       ) : (
         <img
-          src={"side" in team && team.side === "CT" ? LogoCT : LogoT}
+          src={getFallbackLogo(team)}
           width={width}
           height={height}
           alt={"Team logo"}
