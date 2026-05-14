@@ -1,12 +1,20 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import "./radar.scss";
 import { Match, Veto } from "../../API/types";
 import { Map, CSGO, Team } from 'csgogsi';
 import Radar from './Radar'
+import { getMapDisplayName } from "./mapDisplayNames";
 
-import { useAction } from "../../API/contexts/actions";
+import { useAction, useConfig } from "../../API/contexts/actions";
+import { GetInputsFromSection, Sections } from "../../API/contexts/settings";
 
 interface Props { match: Match | null, map: Map, game: CSGO }
+interface MapsListProps { match: Match, map: Map }
+
+type DisplaySettings = GetInputsFromSection<Sections["display_settings"]>;
+
+const MAPS_VIEW_MS = 8000;
+const TOURNAMENT_VIEW_MS = 4500;
 
  const RadarMaps = ({ match, map, game }: Props) => {
     const [ radarSize, setRadarSize ] = useState(366);
@@ -35,24 +43,66 @@ interface Props { match: Match | null, map: Map, game: CSGO }
 export default RadarMaps;
 
 const MapsBar = ({ match, map }: Props) => {
+    const [showTournamentInfo, setShowTournamentInfo] = useState(false);
+    const displaySettings = useConfig("display_settings") as DisplaySettings | undefined;
+    const tournamentTitle = displaySettings?.radar_tournament_title?.trim();
+    const tournamentStage = displaySettings?.radar_tournament_stage?.trim();
+    const hasTournamentInfo = Boolean(tournamentTitle || tournamentStage);
+
+    useEffect(() => {
+        if (!hasTournamentInfo) {
+            setShowTournamentInfo(false);
+            return;
+        }
+
+        let timeoutId: ReturnType<typeof setTimeout>;
+
+        const scheduleNextView = (showInfo: boolean) => {
+            timeoutId = setTimeout(() => {
+                setShowTournamentInfo(showInfo);
+                scheduleNextView(!showInfo);
+            }, showInfo ? MAPS_VIEW_MS : TOURNAMENT_VIEW_MS);
+        };
+
+        setShowTournamentInfo(false);
+        scheduleNextView(true);
+
+        return () => clearTimeout(timeoutId);
+    }, [hasTournamentInfo, tournamentStage, tournamentTitle]);
+
     if (!match || !match.vetos.length) return '';
+
+    return <div id="maps_container">
+        <div className={`maps_bar_view maps_view ${!showTournamentInfo ? 'visible' : ''}`}>
+            <MapsList match={match} map={map} />
+        </div>
+        {hasTournamentInfo ? (
+            <div className={`maps_bar_view tournament_info ${showTournamentInfo ? 'visible' : ''}`}>
+                <div className="tournament_title">{tournamentTitle}</div>
+                <div className="tournament_stage">{tournamentStage}</div>
+            </div>
+        ) : null}
+    </div>
+}
+
+const MapsList = ({ match, map }: MapsListProps) => {
     const picks = match.vetos.filter(veto => veto.type !== "ban" && veto.mapName);
     if (picks.length > 3) {
         const current = picks.find(veto => map.name.includes(veto.mapName));
         if (!current) return null;
-        return <div id="maps_container">
+        return <>
             <div className="bestof">Best of {match.matchType.replace("bo", "")}</div>
             {<MapEntry veto={current} map={map} team={current.type === "decider" ? null : map.team_ct.id === current.teamId ? map.team_ct : map.team_t} />}
-        </div>
+        </>
     }
-    return <div id="maps_container">
-    <div className="bestof">Best of {match.matchType.replace("bo", "")}</div>
+    return <>
+        <div className="bestof">Best of {match.matchType.replace("bo", "")}</div>
         {match.vetos.filter(veto => veto.type !== "ban").filter(veto => veto.teamId || veto.type === "decider").map(veto => <MapEntry key={veto.mapName} veto={veto} map={map} team={veto.type === "decider" ? null : map.team_ct.id === veto.teamId ? map.team_ct : map.team_t} />)}
-    </div>
+    </>
 }
 
 const MapEntry = ({ veto, map }: { veto: Veto, map: Map, team: Team | null }) => {
     return <div className="veto_entry">
-        <div className={`map_name ${map.name.includes(veto.mapName) ? 'active' : ''}`}>{veto.mapName.replace("de_", "")}</div>
+        <div className={`map_name ${map.name.includes(veto.mapName) ? 'active' : ''}`}>{getMapDisplayName(veto.mapName)}</div>
     </div>
 }

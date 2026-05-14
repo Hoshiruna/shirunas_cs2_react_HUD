@@ -87,6 +87,10 @@ export interface Veto {
   hudReverseSide?: boolean;
   gsiSideOverride?: boolean;
   gsiLeftSide?: "CT" | "T";
+  gsiPlayerSlots?: {
+    left: number[];
+    right: number[];
+  };
   leftSide?: "CT" | "T" | null;
   rightSide?: "CT" | "T" | null;
   rounds?: (RoundData | null)[],
@@ -100,6 +104,7 @@ export interface Veto {
 export interface Match {
   id: string;
   current: boolean;
+  gsiPlayerOverlayMode?: boolean;
   left: {
     id: string | null;
     wins: number;

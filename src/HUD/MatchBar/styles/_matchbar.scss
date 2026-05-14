@@ -1,8 +1,7 @@
 #matchbar {
-  display: flex;
-  flex-direction: row;
+  display: grid;
+  grid-template-columns: 250px 40px 170px 40px 250px;
   position: fixed;
-  justify-content: center;
   align-items: stretch;
   width: 750px;
   height: 85px;
@@ -13,6 +12,31 @@
   border-radius: 0 0 4px 4px;
   background: linear-gradient(180deg, #1d262d 0%, #12191f 100%);
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.35);
+  isolation: isolate;
+  --matchbar-left-tint-color: transparent;
+  --matchbar-right-tint-color: transparent;
+
+  &::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    z-index: 0;
+    pointer-events: none;
+    opacity: 0.52;
+    background: linear-gradient(
+      90deg,
+      var(--matchbar-left-tint-color) 0%,
+      transparent 13%,
+      transparent 88%,
+      var(--matchbar-right-tint-color) 100%
+    );
+  }
+
+  > * {
+    position: relative;
+    z-index: 1;
+    min-width: 0;
+  }
 
   .CT {
     color: var(--color-new-ct);

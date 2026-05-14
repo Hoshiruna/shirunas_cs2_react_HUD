@@ -74,6 +74,16 @@
                 "label": "Matchbar right logo background color"
             },
             {
+                "type": "text",
+                "name": "radar_tournament_title",
+                "label": "Radar tournament title"
+            },
+            {
+                "type": "text",
+                "name": "radar_tournament_stage",
+                "label": "Radar tournament stage"
+            },
+            {
                 "type":"select",
                 "name":"replace_avatars",
                 "label":"Use team logos as player avatars",

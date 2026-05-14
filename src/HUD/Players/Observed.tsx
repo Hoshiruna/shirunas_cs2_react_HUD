@@ -9,10 +9,15 @@ import {
   HealthFull,
   Bullets,
 } from "../../assets/Icons";
-import { apiUrl } from "./../../API";
 import { useAction } from "../../API/contexts/actions";
 import Bomb from "../Indicators/Bomb";
 import Defuse from "../Indicators/Defuse";
+import {
+  getDisplayAvatar,
+  getDisplayName,
+  getDisplaySide,
+  getDisplayTeamId,
+} from "./playerDisplay";
 
 const Observed = ({ player }: { player: Player | null }) => {
   const [showCam, setShowCam] = useState(true);
@@ -32,21 +37,24 @@ const Observed = ({ player }: { player: Player | null }) => {
       (weapon) => weapon.type === "Grenade" && weapon.state === "active"
     )[0] || null;
   const healthbarWidth = { width: `${player.state.health}%` };
+  const displayName = getDisplayName(player);
+  const displaySide = getDisplaySide(player);
 
   return (
     <div className="observed_container">
-      <div className={`avatar_holder ${player.team.side}`}>
+      <div className={`avatar_holder ${displaySide}`}>
         <Avatar
-          teamId={player.team.id}
+          teamId={getDisplayTeamId(player)}
           steamid={player.steamid}
+          avatarUrl={getDisplayAvatar(player)}
           height={140}
           width={140}
           showCam={showCam}
           slot={player.observer_slot}
-          teamSide={player.team.side}
+          teamSide={displaySide}
         />
       </div>
-      <div className={`observed ${player.team.side}`}>
+      <div className={`observed ${displaySide}`}>
         <div className="health_row">
           <div className="health_armor_container">
             <div className="health-icon icon">
@@ -60,7 +68,7 @@ const Observed = ({ player }: { player: Player | null }) => {
         </div>
         <div className="main_row">
           <div className="username_container">
-            <div className="username">{player.name}</div>
+            <div className="username">{displayName}</div>
           </div>
         </div>
         <div className="weapon_row">
@@ -127,7 +135,7 @@ const Observed = ({ player }: { player: Player | null }) => {
           </div>
         </div>
       </div>
-      <div className={`healthbar-container ${player.team.side}`}>
+      <div className={`healthbar-container ${displaySide}`}>
         <div className="healthbar_holder">
           <div className="healthbar" style={healthbarWidth}></div>
         </div>

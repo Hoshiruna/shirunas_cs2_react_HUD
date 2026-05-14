@@ -1,10 +1,14 @@
 import * as I from "csgogsi";
 import "./styles/index.scss";
 import TeamScore from "./TeamScore";
-import Bomb from "./../Timers/BombTimer";
-import { useBombTimer } from "./../Timers/Countdown";
+import BombTimer from "./../Timers/BombTimer";
+import { MAX_TIMER, useBombTimer } from "./../Timers/Countdown";
+import { C4 } from "../../assets/Icons";
 import { Match } from "./../../API/types";
 import { getDisplayTeams } from "../displayState";
+import { CSSProperties } from "react";
+import { useConfig } from "../../API/contexts/actions";
+import { GetInputsFromSection, Sections } from "../../API/contexts/settings";
 
 function stringToClock(time: string | number, pad = true) {
   if (typeof time === "string") {
@@ -26,6 +30,41 @@ interface IProps {
   bomb: I.Bomb | null;
 }
 
+type DisplaySettings = GetInputsFromSection<Sections["display_settings"]> & {
+  matchbar_logo_background?: string;
+};
+
+type MatchbarStyle = CSSProperties & {
+  "--matchbar-left-tint-color"?: string;
+  "--matchbar-right-tint-color"?: string;
+};
+
+const getConfigColor = (color?: string): string | undefined => {
+  const trimmedColor = color?.trim();
+
+  if (!trimmedColor) return undefined;
+  if (window.CSS?.supports("color", trimmedColor)) return trimmedColor;
+
+  return undefined;
+};
+
+const getMatchbarStyle = (
+  displaySettings?: DisplaySettings
+): MatchbarStyle => {
+  const sharedColor = displaySettings?.matchbar_logo_background;
+  const leftTint = getConfigColor(
+    displaySettings?.matchbar_left_logo_background_color || sharedColor
+  );
+  const rightTint = getConfigColor(
+    displaySettings?.matchbar_right_logo_background_color || sharedColor
+  );
+
+  return {
+    ...(leftTint && { "--matchbar-left-tint-color": leftTint }),
+    ...(rightTint && { "--matchbar-right-tint-color": rightTint }),
+  };
+};
+
 export interface Timer {
   time: number;
   active: boolean;
@@ -46,21 +85,16 @@ const Matchbar = (props: IProps) => {
   const { bomb, match, map, phase } = props;
   const time = stringToClock(phase.phase_ends_in);
   const { left, right } = getDisplayTeams(map, match);
-  const isPlanted =
-    bomb && (bomb.state === "defusing" || bomb.state === "planted");
+  const displaySettings = useConfig("display_settings") as
+    | DisplaySettings
+    | undefined;
   const bo = (match && Number(match.matchType.substr(-1))) || 0;
 
   const bombData = useBombTimer();
-  const plantTimer: Timer | null =
-    bombData.state === "planting"
-      ? {
-          time: bombData.plantTime,
-          active: true,
-          side: bombData.player?.team.orientation || "right",
-          player: bombData.player,
-          type: "planting",
-        }
-      : null;
+  const isC4Active =
+    bombData.state === "planting" ||
+    bombData.state === "planted" ||
+    bombData.state === "defusing";
   const defuseTimer: Timer | null =
     bombData.state === "defusing"
       ? {
@@ -71,32 +105,69 @@ const Matchbar = (props: IProps) => {
           type: "defusing",
         }
       : null;
+  const c4Timer: Timer | null =
+    bombData.state === "planting"
+      ? {
+          time: bombData.plantTime,
+          active: true,
+          side: bombData.player?.team.orientation || "right",
+          player: bombData.player,
+          type: "planting",
+        }
+      : bombData.state === "planted" || bombData.state === "defusing"
+      ? {
+          time: bombData.bombTime,
+          active: true,
+          side: bombData.player?.team.orientation || "right",
+          player: bombData.player,
+          type: "planting",
+        }
+      : null;
+  const c4MaxTime =
+    bombData.state === "planting" ? MAX_TIMER.planting : MAX_TIMER.bomb;
+  const c4ProgressMode = bombData.state === "planting" ? "fill" : "drain";
+  const c4Side = left.side === "T" ? "left" : "right";
+  const defuseSide = left.side === "CT" ? "left" : "right";
+  const defuseMaxTime = defuseTimer?.player?.state.defusekit
+    ? MAX_TIMER.defuse_kit
+    : MAX_TIMER.defuse_nokit;
 
   return (
     <>
-      <div id={`matchbar`}>
-        <TeamScore
-          team={left}
-          orientation={"left"}
-          timer={left.side === "CT" ? defuseTimer : plantTimer}
-        />
+      <div id={`matchbar`} style={getMatchbarStyle(displaySettings)}>
+        <TeamScore team={left} orientation={"left"} />
         <div className={`score left ${left.side}`}>{left.score}</div>
         <div id="timer" className={bo === 0 ? "no-bo" : ""}>
-          <div id={`round_timer_text`} className={isPlanted ? "hide" : ""}>
+          <div
+            className={`timer_c4_icon ${isC4Active ? "show" : "hide"}`}
+          >
+            <C4 />
+          </div>
+          <div id={`round_timer_text`} className={isC4Active ? "hide" : ""}>
             {time}
           </div>
-          <div id="round_now" className={isPlanted ? "hide" : ""}>
+          <div id="round_now" className={isC4Active ? "hide" : ""}>
             {getRoundLabel(map.round)}
           </div>
-          <Bomb />
         </div>
         <div className={`score right ${right.side}`}>{right.score}</div>
-        <TeamScore
-          team={right}
-          orientation={"right"}
-          timer={right.side === "CT" ? defuseTimer : plantTimer}
-        />
+        <TeamScore team={right} orientation={"right"} />
       </div>
+      <BombTimer
+        time={c4Timer?.time || 0}
+        active={Boolean(c4Timer?.active)}
+        side={c4Side}
+        type="c4"
+        maxTime={c4MaxTime}
+        progressMode={c4ProgressMode}
+      />
+      <BombTimer
+        time={defuseTimer?.time || 0}
+        active={Boolean(defuseTimer?.active)}
+        side={defuseSide}
+        type="defuse"
+        maxTime={defuseMaxTime}
+      />
     </>
   );
 };

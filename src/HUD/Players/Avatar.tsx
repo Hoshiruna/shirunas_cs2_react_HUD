@@ -13,6 +13,7 @@ interface AvatarProps {
   sidePlayer?: boolean;
   teamSide?: string;
   flashed?: number | undefined;
+  avatarUrl?: string | null;
 }
 
 const getAvatar = async (steamid: string) => {
@@ -41,23 +42,30 @@ const Avatar = ({
   sidePlayer,
   teamSide,
   flashed,
+  avatarUrl,
 }: AvatarProps) => {
   const flashValue = flashed ? (flashed < 100 ? 100 : flashed * 2) : 100;
   const defaultPic = teamSide === "CT" ? playerCT : playerT;
   const [avatar, setAvatar] = useState<string | null>(null);
 
   useEffect(() => {
+    if (avatarUrl) {
+      setAvatar(avatarUrl);
+      return;
+    }
+
+    setAvatar(null);
+
     const fetchAvatar = async () => {
       try {
         const avatarUrl = await getAvatar(steamid);
-        console.log(avatarUrl);
         setAvatar(avatarUrl);
       } catch (error) {
         console.error(error);
       }
     };
     fetchAvatar();
-  }, [steamid]);
+  }, [avatarUrl, steamid]);
 
   return (
     <div className={"avatar"}>

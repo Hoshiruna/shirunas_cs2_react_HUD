@@ -1,21 +1,44 @@
-import { MAX_TIMER, useBombTimer } from "./Countdown";
-import { C4 } from "../../assets/Icons";
+import { MAX_TIMER } from "./Countdown";
 
-const Bomb = () => {
-  const bombData = useBombTimer();
-  const show = bombData.state === "planted" || bombData.state === "defusing";
+interface IProps {
+  time: number;
+  active: boolean;
+  side?: "left" | "right";
+  type: "c4" | "defuse";
+  maxTime?: number;
+  progressMode?: "fill" | "drain";
+}
+
+const BombTimer = ({
+  time,
+  active,
+  side,
+  type,
+  maxTime,
+  progressMode = "drain",
+}: IProps) => {
+  const timerMax = maxTime || MAX_TIMER.bomb;
+  const progress =
+    progressMode === "fill"
+      ? ((timerMax - time) * 100) / timerMax
+      : (time * 100) / timerMax;
+  const clampedProgress = Math.max(0, Math.min(100, progress));
 
   return (
-    <div id={`bomb_container`}>
-      <div
-        className={`bomb_timer ${show ? "show" : "hide"}`}
-        style={{ height: `${(bombData.bombTime * 100) / MAX_TIMER.bomb}%` }}
-      ></div>
-      <div className={`bomb_icon ${show ? "show" : "hide"}`}>
-        <C4 fill="white" />
+    <div
+      className={`objective_timer ${type} ${active ? "show" : "hide"} ${
+        side || ""
+      }`}
+    >
+      <span className="objective_label">{type === "c4" ? "C4" : "DEFUSE"}</span>
+      <div className="objective_track">
+        <div
+          className="objective_progress"
+          style={{ width: `${clampedProgress}%` }}
+        />
       </div>
     </div>
   );
 };
 
-export default Bomb;
+export default BombTimer;

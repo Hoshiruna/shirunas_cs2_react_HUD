@@ -1,0 +1,24 @@
+.objective_timer {
+  &.defuse {
+    color: #ffffff;
+
+    .objective_label {
+      width: 54px;
+      height: 18px;
+      font-size: 13px;
+      line-height: 18px;
+      font-weight: 900;
+      letter-spacing: 0;
+    }
+
+    .objective_track {
+      height: 10px; // defuse progress bar thickness
+      background: rgba(255, 255, 255, 0.42);
+      border: 2px solid rgba(0, 0, 0, 0.95);
+    }
+
+    .objective_progress {
+      background: var(--color-new-ct);
+    }
+  }
+}

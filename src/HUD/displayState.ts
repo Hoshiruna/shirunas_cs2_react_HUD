@@ -1,5 +1,9 @@
 import * as I from "csgogsi";
 import { Match, Veto } from "../API/types";
+import {
+  getDisplayObserverSlot,
+  getDisplayOrientation,
+} from "./Players/playerDisplay";
 
 type Side = "CT" | "T";
 type Orientation = "left" | "right";
@@ -49,6 +53,11 @@ const getVetoLeftSide = (veto: Veto | null): Side | null => {
     : veto.gsiLeftSide;
 };
 
+const getPlayerKey = (player: I.Player) => player.steamid || player.name;
+
+let pinnedPlayerMapKey = "";
+let pinnedPlayerSides = new Map<string, Orientation>();
+
 const mergeDisplayTeam = (
   identityTeam: I.Team,
   sideTeam: I.Team,
@@ -68,7 +77,7 @@ export const getDisplayTeams = (map: I.Map, match: Match | null) => {
   const activeVeto = getActiveVeto(match, map.name);
   const leftSide = getVetoLeftSide(activeVeto);
 
-  if (match && leftSide) {
+  if (match && match.gsiPlayerOverlayMode && leftSide) {
     const rightSide = oppositeSide(leftSide);
     const leftIdentity =
       getTeamById(map, match.left.id) || getOrientationTeam(map, "left");
@@ -106,6 +115,11 @@ const getObserverSlotOrder = (player: I.Player) => {
   return slot === 0 ? 10 : slot;
 };
 
+const getDisplaySlotOrder = (player: I.Player) => {
+  const slot = getDisplayObserverSlot(player) || 0;
+  return slot === 0 ? 10 : slot;
+};
+
 const assignPlayerTeam = (player: I.Player, team: I.Team): I.Player => ({
   ...player,
   team: {
@@ -131,14 +145,27 @@ export const getDisplayState = (game: I.CSGO, match: Match | null) => {
     };
   }
 
+  const mapKey = `${match?.id || "no-match"}:${game.map.name}`;
+  if (pinnedPlayerMapKey !== mapKey) {
+    pinnedPlayerMapKey = mapKey;
+    pinnedPlayerSides = new Map();
+  }
+
   const sortedPlayers = [...game.players].sort(
-    (a, b) => getObserverSlotOrder(a) - getObserverSlotOrder(b)
+    (a, b) => getDisplaySlotOrder(a) - getDisplaySlotOrder(b)
   );
+  sortedPlayers.forEach((player) => {
+    const key = getPlayerKey(player);
+    if (key && !pinnedPlayerSides.has(key)) {
+      pinnedPlayerSides.set(key, getDisplayOrientation(player));
+    }
+  });
+
   const leftPlayers = sortedPlayers
-    .slice(0, 5)
+    .filter((player) => pinnedPlayerSides.get(getPlayerKey(player)) === "left")
     .map((player) => assignPlayerTeam(player, teams.left));
   const rightPlayers = sortedPlayers
-    .slice(5, 10)
+    .filter((player) => pinnedPlayerSides.get(getPlayerKey(player)) === "right")
     .map((player) => assignPlayerTeam(player, teams.right));
   const players = [...leftPlayers, ...rightPlayers];
   const currentPlayer =

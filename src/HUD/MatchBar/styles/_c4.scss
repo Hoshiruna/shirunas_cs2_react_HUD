@@ -1,0 +1,58 @@
+#matchbar {
+  #timer {
+    .timer_c4_icon {
+      display: none;
+      width: 72px;
+      height: 72px;
+      align-items: center;
+      justify-content: center;
+      color: #ff2a2a;
+
+      &.show {
+        display: flex;
+      }
+
+      &.hide {
+        display: none;
+      }
+
+      svg {
+        width: 56px;
+        height: 56px;
+        display: block;
+
+        path,
+        rect,
+        circle,
+        polygon {
+          fill: currentColor;
+        }
+      }
+    }
+  }
+}
+
+.objective_timer {
+  &.c4 {
+    color: #ffffff;
+
+    .objective_label {
+      width: 24px;
+      height: 18px;
+      font-size: 13px;
+      line-height: 18px;
+      font-weight: 900;
+      letter-spacing: 0;
+    }
+
+    .objective_track {
+      height: 10px; // bomb progress bar thickness
+      background: rgba(255, 255, 255, 0.42);
+      border: 2px solid rgba(0, 0, 0, 0.95);
+    }
+
+    .objective_progress {
+      background: var(--color-new-t);
+    }
+  }
+}

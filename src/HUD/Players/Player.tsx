@@ -6,6 +6,14 @@ import Bomb from "./../Indicators/Bomb";
 import Defuse from "./../Indicators/Defuse";
 import React from "react";
 import { Kills, Skull } from "../../assets/Icons";
+import {
+  DisplayPlayer,
+  getDisplayAvatar,
+  getDisplayName,
+  getDisplayObserverSlot,
+  getDisplaySide,
+  getDisplayTeamId,
+} from "./playerDisplay";
 
 interface IProps {
   player: I.Player;
@@ -69,6 +77,18 @@ const arePlayersEqual = (playerOne: I.Player, playerTwo: I.Player) => {
     playerOne.state.equip_value === playerTwo.state.equip_value &&
     playerOne.state.adr === playerTwo.state.adr &&
     playerOne.avatar === playerTwo.avatar &&
+    (playerOne as DisplayPlayer).displayName ===
+      (playerTwo as DisplayPlayer).displayName &&
+    (playerOne as DisplayPlayer).displayAvatar ===
+      (playerTwo as DisplayPlayer).displayAvatar &&
+    (playerOne as DisplayPlayer).displayTeamId ===
+      (playerTwo as DisplayPlayer).displayTeamId &&
+    (playerOne as DisplayPlayer).displaySide ===
+      (playerTwo as DisplayPlayer).displaySide &&
+    (playerOne as DisplayPlayer).displayOrientation ===
+      (playerTwo as DisplayPlayer).displayOrientation &&
+    (playerOne as DisplayPlayer).displayObserverSlot ===
+      (playerTwo as DisplayPlayer).displayObserverSlot &&
     !!playerOne.team.id === !!playerTwo.team.id &&
     playerOne.team.side === playerTwo.team.side &&
     playerOne.country === playerTwo.country &&
@@ -80,6 +100,9 @@ const arePlayersEqual = (playerOne: I.Player, playerTwo: I.Player) => {
   return false;
 };
 const Player = ({ player, isObserved }: IProps) => {
+  const displayName = getDisplayName(player);
+  const displayObserverSlot = getDisplayObserverSlot(player);
+  const displaySide = getDisplaySide(player);
   const weapons = player.weapons.map((weapon) => ({
     ...weapon,
     name: weapon.name.replace("weapon_", ""),
@@ -92,10 +115,9 @@ const Player = ({ player, isObserved }: IProps) => {
   const secondary =
     weapons.filter((weapon) => weapon.type === "Pistol")[0] || null;
   const grenades = weapons.filter((weapon) => weapon.type === "Grenade");
-  const isLeft = player.team.orientation === "left";
   const zeus = weapons.find((weapon) => weapon.name === "taser") || null;
   const hasBomb = weapons.some((weapon) => weapon.type === "C4");
-  const hasDefuseKit = player.team.side === "CT" && player.state.defusekit;
+  const hasDefuseKit = displaySide === "CT" && player.state.defusekit;
   const showObjectiveIcon = hasBomb || hasDefuseKit;
 
   return (
@@ -105,20 +127,21 @@ const Player = ({ player, isObserved }: IProps) => {
       }`}
     >
       <div className="player_data">
-        <div className="obs_slot">{player.observer_slot}</div>
+        <div className="obs_slot">{displayObserverSlot}</div>
         <div className="top_row">
           <Avatar
-            teamId={player.team.id}
+            teamId={getDisplayTeamId(player)}
             steamid={player.steamid}
+            avatarUrl={getDisplayAvatar(player)}
             height={57}
             width={57}
             showSkull={false}
             showCam={false}
             sidePlayer={true}
-            teamSide={player.team.side}
+            teamSide={displaySide}
           />
           <div className="username_money">
-            <div className="username">{player.name}</div>
+            <div className="username">{displayName}</div>
             <div className="money">${player.state.money}</div>
           </div>
           <div className="player-stats">
