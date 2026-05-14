@@ -6,10 +6,11 @@ import { useState } from "react";
 
 interface IProps {
   orientation: "left" | "right";
+  seriesWinsNeeded: number;
   team: I.Team;
 }
 
-const TeamScore = ({ orientation, team }: IProps) => {
+const TeamScore = ({ orientation, seriesWinsNeeded, team }: IProps) => {
   const [show, setShow] = useState(false);
 
   ONGSI(
@@ -30,7 +31,7 @@ const TeamScore = ({ orientation, team }: IProps) => {
       <div className={`team ${orientation} ${team.side}`}>
         <div className="team-name">
           <div className={`series-dots ${team.side}`}>
-            {new Array(2).fill(0).map((_, i) => (
+            {new Array(seriesWinsNeeded).fill(0).map((_, i) => (
               <span
                 key={i}
                 className={team.matches_won_this_series > i ? "won" : ""}

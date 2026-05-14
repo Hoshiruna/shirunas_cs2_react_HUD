@@ -81,6 +81,12 @@ const getRoundLabel = (mapRound: number) => {
   const OT = Math.ceil(additionalRounds / 6);
   return `OT ${OT} (${additionalRounds - (OT - 1) * 6}/6)`;
 };
+
+const getSeriesWinsNeeded = (match: Match | null) => {
+  const maps = (match && Number(match.matchType.replace("bo", ""))) || 3;
+  return Math.floor(maps / 2) + 1;
+};
+
 const Matchbar = (props: IProps) => {
   const { bomb, match, map, phase } = props;
   const time = stringToClock(phase.phase_ends_in);
@@ -89,6 +95,7 @@ const Matchbar = (props: IProps) => {
     | DisplaySettings
     | undefined;
   const bo = (match && Number(match.matchType.substr(-1))) || 0;
+  const seriesWinsNeeded = getSeriesWinsNeeded(match);
 
   const bombData = useBombTimer();
   const isC4Active =
@@ -135,7 +142,11 @@ const Matchbar = (props: IProps) => {
   return (
     <>
       <div id={`matchbar`} style={getMatchbarStyle(displaySettings)}>
-        <TeamScore team={left} orientation={"left"} />
+        <TeamScore
+          team={left}
+          orientation={"left"}
+          seriesWinsNeeded={seriesWinsNeeded}
+        />
         <div className={`score left ${left.side}`}>{left.score}</div>
         <div id="timer" className={bo === 0 ? "no-bo" : ""}>
           <div
@@ -151,7 +162,11 @@ const Matchbar = (props: IProps) => {
           </div>
         </div>
         <div className={`score right ${right.side}`}>{right.score}</div>
-        <TeamScore team={right} orientation={"right"} />
+        <TeamScore
+          team={right}
+          orientation={"right"}
+          seriesWinsNeeded={seriesWinsNeeded}
+        />
       </div>
       <BombTimer
         time={c4Timer?.time || 0}

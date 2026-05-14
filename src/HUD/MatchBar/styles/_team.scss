@@ -1,6 +1,6 @@
 #matchbar {
   .team {
-    width: 250px;
+    width: 272px;
     min-width: 0;
     display: flex;
     align-items: center;
@@ -8,15 +8,15 @@
     .logo {
       display: flex;
       flex-direction: row;
-      width: 86px;
+      width: 74px;
       height: 84px;
       align-items: center;
       overflow: hidden;
       justify-content: center;
 
       img {
-        max-width: 76%;
-        max-height: 76%;
+        max-width: 72%;
+        max-height: 72%;
         object-fit: contain;
       }
     }
@@ -60,19 +60,19 @@
     display: flex;
     flex-direction: column;
     gap: 3px;
-    width: 164px;
+    width: 198px;
     min-width: 0;
     height: 84px;
     align-items: center;
     justify-content: center;
     font-weight: 800;
-    font-size: 20px;
-    line-height: 21px;
+    font-size: 17px;
+    line-height: 18px;
     color: white;
     background: transparent;
 
     span {
-      max-width: 148px;
+      max-width: 190px;
       overflow: hidden;
       text-overflow: ellipsis;
       white-space: nowrap;
