@@ -91,6 +91,7 @@ const getSeriesWinsNeeded = (match: Match | null) => {
 const Matchbar = (props: IProps) => {
   const { bomb, match, map, phase } = props;
   const [roundWinner, setRoundWinner] = useState<"left" | "right" | null>(null);
+  const [roundWinnerExpanded, setRoundWinnerExpanded] = useState(false);
   const roundWinnerTimeout = useRef<ReturnType<typeof setTimeout> | null>(null);
   const time = stringToClock(phase.phase_ends_in);
   const { left, right } = getDisplayTeams(map, match);
@@ -104,13 +105,14 @@ const Matchbar = (props: IProps) => {
     "roundEnd",
     (result) => {
       setRoundWinner(result.winner.orientation);
+      setRoundWinnerExpanded(true);
 
       if (roundWinnerTimeout.current) {
         clearTimeout(roundWinnerTimeout.current);
       }
 
       roundWinnerTimeout.current = setTimeout(() => {
-        setRoundWinner(null);
+        setRoundWinnerExpanded(false);
       }, 5000);
     },
     []
@@ -211,11 +213,20 @@ const Matchbar = (props: IProps) => {
         type="defuse"
         maxTime={defuseMaxTime}
       />
-      {roundWinner && (
-        <div className={`round-winner-popup ${roundWinner}`}>
-          <WinAnnouncement team={roundWinner === "left" ? left : right} />
+      {(["left", "right"] as const).map((side) => (
+        <div
+          key={side}
+          className={`round-winner-popup ${side} ${
+            roundWinner === side && roundWinnerExpanded
+              ? "expanded"
+              : "collapsed"
+          }`}
+        >
+          {roundWinner === side && (
+            <WinAnnouncement team={side === "left" ? left : right} />
+          )}
         </div>
-      )}
+      ))}
     </>
   );
 };
