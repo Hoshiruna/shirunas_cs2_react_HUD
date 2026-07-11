@@ -170,39 +170,31 @@ const Matchbar = (props: IProps) => {
   return (
     <>
       <div id={`matchbar`} style={getMatchbarStyle(displaySettings)}>
-        {roundWinner ? (
-          <div className="round-winner-display">
-            <WinAnnouncement team={roundWinner === "left" ? left : right} />
-          </div>
-        ) : (
-          <>
-            <TeamScore
-              team={left}
-              orientation={"left"}
-              seriesWinsNeeded={seriesWinsNeeded}
-            />
+        <TeamScore
+          team={left}
+          orientation={"left"}
+          seriesWinsNeeded={seriesWinsNeeded}
+        />
           <div className={`score left ${left.side}`}>{left.score}</div>
-            <div id="timer" className={bo === 0 ? "no-bo" : ""}>
-              <div
-                className={`timer_c4_icon ${isC4Active ? "show" : "hide"}`}
-              >
-                <C4 />
-              </div>
-              <div id={`round_timer_text`} className={isC4Active ? "hide" : ""}>
-                {time}
-              </div>
-              <div id="round_now" className={isC4Active ? "hide" : ""}>
-                {getRoundLabel(map.round)}
-              </div>
-            </div>
-            <div className={`score right ${right.side}`}>{right.score}</div>
-            <TeamScore
-              team={right}
-              orientation={"right"}
-              seriesWinsNeeded={seriesWinsNeeded}
-            />
-          </>
-        )}
+        <div id="timer" className={bo === 0 ? "no-bo" : ""}>
+          <div
+            className={`timer_c4_icon ${isC4Active ? "show" : "hide"}`}
+          >
+            <C4 />
+          </div>
+          <div id={`round_timer_text`} className={isC4Active ? "hide" : ""}>
+            {time}
+          </div>
+          <div id="round_now" className={isC4Active ? "hide" : ""}>
+            {getRoundLabel(map.round)}
+          </div>
+        </div>
+        <div className={`score right ${right.side}`}>{right.score}</div>
+        <TeamScore
+          team={right}
+          orientation={"right"}
+          seriesWinsNeeded={seriesWinsNeeded}
+        />
       </div>
       <BombTimer
         time={c4Timer?.time || 0}
@@ -219,6 +211,11 @@ const Matchbar = (props: IProps) => {
         type="defuse"
         maxTime={defuseMaxTime}
       />
+      {roundWinner && (
+        <div className={`round-winner-popup ${roundWinner}`}>
+          <WinAnnouncement team={roundWinner === "left" ? left : right} />
+        </div>
+      )}
     </>
   );
 };

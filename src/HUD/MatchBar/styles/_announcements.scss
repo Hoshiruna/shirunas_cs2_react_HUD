@@ -1,19 +1,37 @@
-@keyframes slideRoundWinnerIn {
+@keyframes showRoundWinnerPopup {
   from {
-    transform: translateX(-100%);
+    opacity: 0;
+    transform: translateY(-8px) scale(0.98);
   }
 
   to {
-    transform: translateX(0);
+    opacity: 1;
+    transform: translateY(0) scale(1);
   }
 }
 
-#matchbar .round-winner-display {
-  grid-column: 1 / -1;
+.round-winner-popup {
+  position: fixed;
+  top: 134px;
   display: flex;
-  width: 100%;
-  height: 100%;
+  width: 312px;
+  height: 44px;
+  box-sizing: border-box;
   overflow: hidden;
+  align-items: center;
+  justify-content: center;
+  border-radius: 4px;
+  background: linear-gradient(180deg, #1d262d 0%, #12191f 100%);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.35);
+  animation: showRoundWinnerPopup 300ms ease-out both;
+
+  &.left {
+    right: calc(50% + 85px);
+  }
+
+  &.right {
+    left: calc(50% + 85px);
+  }
 
   .win_text {
     display: flex;
@@ -30,7 +48,6 @@
     font-weight: 800;
     white-space: nowrap;
     text-overflow: ellipsis;
-    animation: slideRoundWinnerIn 500ms ease-out both;
   }
 }
 

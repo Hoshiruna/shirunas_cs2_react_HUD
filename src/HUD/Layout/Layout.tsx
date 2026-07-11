@@ -47,18 +47,6 @@ const Layout = ({ game, match }: Props) => {
     game.phase_countdowns.phase === "freezetime";
   return (
     <div className="layout">
-      <div className={`players_alive`}>
-        <div className="title_container">Players alive</div>
-        <div className="counter_container">
-          <div className={`team_counter ${left.side}`}>
-            {leftPlayers.filter((player) => player.state.health > 0).length}
-          </div>
-          <div className={`vs_counter`}>VS</div>
-          <div className={`team_counter ${right.side}`}>
-            {rightPlayers.filter((player) => player.state.health > 0).length}
-          </div>
-        </div>
-      </div>
       <Killfeed />
       {/* <Overview match={match} map={game.map} players={game.players || []} /> */}
       <RadarMaps match={match} map={game.map} game={game} />
