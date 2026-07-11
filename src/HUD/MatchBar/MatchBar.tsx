@@ -1,13 +1,14 @@
 import * as I from "csgogsi";
 import "./styles/index.scss";
 import TeamScore from "./TeamScore";
+import WinAnnouncement from "./WinIndicator";
 import BombTimer from "./../Timers/BombTimer";
 import { MAX_TIMER, useBombTimer } from "./../Timers/Countdown";
 import { C4 } from "../../assets/Icons";
 import { Match } from "./../../API/types";
 import { getDisplayTeams } from "../displayState";
-import { CSSProperties } from "react";
-import { useConfig } from "../../API/contexts/actions";
+import { CSSProperties, useEffect, useRef, useState } from "react";
+import { ONGSI, useConfig } from "../../API/contexts/actions";
 import { GetInputsFromSection, Sections } from "../../API/contexts/settings";
 
 function stringToClock(time: string | number, pad = true) {
@@ -89,6 +90,8 @@ const getSeriesWinsNeeded = (match: Match | null) => {
 
 const Matchbar = (props: IProps) => {
   const { bomb, match, map, phase } = props;
+  const [roundWinner, setRoundWinner] = useState<"left" | "right" | null>(null);
+  const roundWinnerTimeout = useRef<ReturnType<typeof setTimeout> | null>(null);
   const time = stringToClock(phase.phase_ends_in);
   const { left, right } = getDisplayTeams(map, match);
   const displaySettings = useConfig("display_settings") as
@@ -97,9 +100,34 @@ const Matchbar = (props: IProps) => {
   const bo = (match && Number(match.matchType.substr(-1))) || 0;
   const seriesWinsNeeded = getSeriesWinsNeeded(match);
 
+  ONGSI(
+    "roundEnd",
+    (result) => {
+      setRoundWinner(result.winner.orientation);
+
+      if (roundWinnerTimeout.current) {
+        clearTimeout(roundWinnerTimeout.current);
+      }
+
+      roundWinnerTimeout.current = setTimeout(() => {
+        setRoundWinner(null);
+      }, 5000);
+    },
+    []
+  );
+
+  useEffect(() => {
+    return () => {
+      if (roundWinnerTimeout.current) {
+        clearTimeout(roundWinnerTimeout.current);
+      }
+    };
+  }, []);
+
   const bombData = useBombTimer();
+  const isPlanting = bombData.state === "planting";
   const isC4Active =
-    bombData.state === "planting" ||
+    isPlanting ||
     bombData.state === "planted" ||
     bombData.state === "defusing";
   const defuseTimer: Timer | null =
@@ -113,7 +141,7 @@ const Matchbar = (props: IProps) => {
         }
       : null;
   const c4Timer: Timer | null =
-    bombData.state === "planting"
+    isPlanting
       ? {
           time: bombData.plantTime,
           active: true,
@@ -131,8 +159,8 @@ const Matchbar = (props: IProps) => {
         }
       : null;
   const c4MaxTime =
-    bombData.state === "planting" ? MAX_TIMER.planting : MAX_TIMER.bomb;
-  const c4ProgressMode = bombData.state === "planting" ? "fill" : "drain";
+    isPlanting ? MAX_TIMER.planting : MAX_TIMER.bomb;
+  const c4ProgressMode = isPlanting ? "fill" : "drain";
   const c4Side = left.side === "T" ? "left" : "right";
   const defuseSide = left.side === "CT" ? "left" : "right";
   const defuseMaxTime = defuseTimer?.player?.state.defusekit
@@ -142,31 +170,39 @@ const Matchbar = (props: IProps) => {
   return (
     <>
       <div id={`matchbar`} style={getMatchbarStyle(displaySettings)}>
-        <TeamScore
-          team={left}
-          orientation={"left"}
-          seriesWinsNeeded={seriesWinsNeeded}
-        />
-        <div className={`score left ${left.side}`}>{left.score}</div>
-        <div id="timer" className={bo === 0 ? "no-bo" : ""}>
-          <div
-            className={`timer_c4_icon ${isC4Active ? "show" : "hide"}`}
-          >
-            <C4 />
+        {roundWinner ? (
+          <div className="round-winner-display">
+            <WinAnnouncement team={roundWinner === "left" ? left : right} />
           </div>
-          <div id={`round_timer_text`} className={isC4Active ? "hide" : ""}>
-            {time}
-          </div>
-          <div id="round_now" className={isC4Active ? "hide" : ""}>
-            {getRoundLabel(map.round)}
-          </div>
-        </div>
-        <div className={`score right ${right.side}`}>{right.score}</div>
-        <TeamScore
-          team={right}
-          orientation={"right"}
-          seriesWinsNeeded={seriesWinsNeeded}
-        />
+        ) : (
+          <>
+            <TeamScore
+              team={left}
+              orientation={"left"}
+              seriesWinsNeeded={seriesWinsNeeded}
+            />
+          <div className={`score left ${left.side}`}>{left.score}</div>
+            <div id="timer" className={bo === 0 ? "no-bo" : ""}>
+              <div
+                className={`timer_c4_icon ${isC4Active ? "show" : "hide"}`}
+              >
+                <C4 />
+              </div>
+              <div id={`round_timer_text`} className={isC4Active ? "hide" : ""}>
+                {time}
+              </div>
+              <div id="round_now" className={isC4Active ? "hide" : ""}>
+                {getRoundLabel(map.round)}
+              </div>
+            </div>
+            <div className={`score right ${right.side}`}>{right.score}</div>
+            <TeamScore
+              team={right}
+              orientation={"right"}
+              seriesWinsNeeded={seriesWinsNeeded}
+            />
+          </>
+        )}
       </div>
       <BombTimer
         time={c4Timer?.time || 0}

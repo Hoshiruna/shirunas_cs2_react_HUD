@@ -23,6 +23,9 @@ const BombTimer = ({
       ? ((timerMax - time) * 100) / timerMax
       : (time * 100) / timerMax;
   const clampedProgress = Math.max(0, Math.min(100, progress));
+  const progressStyle = {
+    transform: `scaleX(${clampedProgress / 100})`,
+  };
 
   return (
     <div
@@ -30,12 +33,8 @@ const BombTimer = ({
         side || ""
       }`}
     >
-      <span className="objective_label">{type === "c4" ? "C4" : "DEFUSE"}</span>
       <div className="objective_track">
-        <div
-          className="objective_progress"
-          style={{ width: `${clampedProgress}%` }}
-        />
+        <div className="objective_progress" style={progressStyle} />
       </div>
     </div>
   );

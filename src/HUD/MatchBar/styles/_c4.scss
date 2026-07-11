@@ -2,8 +2,8 @@
   #timer {
     .timer_c4_icon {
       display: none;
-      width: 72px;
-      height: 72px;
+      width: 78px;
+      height: 78px;
       align-items: center;
       justify-content: center;
       color: #ff2a2a;
@@ -17,8 +17,8 @@
       }
 
       svg {
-        width: 56px;
-        height: 56px;
+        width: 64px;
+        height: 64px;
         display: block;
 
         path,
@@ -35,24 +35,26 @@
 .objective_timer {
   &.c4 {
     color: #ffffff;
-
-    .objective_label {
-      width: 24px;
-      height: 18px;
-      font-size: 13px;
-      line-height: 18px;
-      font-weight: 900;
-      letter-spacing: 0;
-    }
+    left: 50%;
+    right: auto;
+    top: 105px;
+    width: 794px;
+    transform: translateX(-50%);
 
     .objective_track {
-      height: 10px; // bomb progress bar thickness
-      background: rgba(255, 255, 255, 0.42);
-      border: 2px solid rgba(0, 0, 0, 0.95);
+      height: 6px; // bomb progress bar thickness
+      background: transparent;
+      border: 0;
+      border-radius: 0;
+      box-shadow: none;
     }
 
     .objective_progress {
+      inset: 0;
+      width: 100%;
       background: var(--color-new-t);
+      border-radius: 0;
+      transform-origin: center;
     }
   }
 }

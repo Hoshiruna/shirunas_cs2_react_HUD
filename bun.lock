@@ -2,7 +2,7 @@
   "lockfileVersion": 1,
   "workspaces": {
     "": {
-      "name": "cs2-react-hud",
+      "name": "ournotes-cs2-react-hud",
       "dependencies": {
         "axios": "^1.7.8",
         "csgogsi": "^3.0.5",
