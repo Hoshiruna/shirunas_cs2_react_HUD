@@ -42,16 +42,22 @@ const TOURNAMENT_VIEW_MS = 4500;
 
 export default RadarMaps;
 
-const MapsBar = ({ match, map }: Props) => {
+const MapsBar = ({ match, map }: MapsListProps) => {
     const [showTournamentInfo, setShowTournamentInfo] = useState(false);
     const displaySettings = useConfig("display_settings") as DisplaySettings | undefined;
     const tournamentTitle = displaySettings?.radar_tournament_title?.trim();
     const tournamentStage = displaySettings?.radar_tournament_stage?.trim();
     const hasTournamentInfo = Boolean(tournamentTitle || tournamentStage);
+    const hasMaps = match.vetos.length > 0;
 
     useEffect(() => {
         if (!hasTournamentInfo) {
             setShowTournamentInfo(false);
+            return;
+        }
+
+        if (!hasMaps) {
+            setShowTournamentInfo(true);
             return;
         }
 
@@ -68,14 +74,16 @@ const MapsBar = ({ match, map }: Props) => {
         scheduleNextView(true);
 
         return () => clearTimeout(timeoutId);
-    }, [hasTournamentInfo, tournamentStage, tournamentTitle]);
+    }, [hasMaps, hasTournamentInfo, tournamentStage, tournamentTitle]);
 
-    if (!match || !match.vetos.length) return '';
+    if (!hasMaps && !hasTournamentInfo) return '';
 
     return <div id="maps_container">
-        <div className={`maps_bar_view maps_view ${!showTournamentInfo ? 'visible' : ''}`}>
-            <MapsList match={match} map={map} />
-        </div>
+        {hasMaps ? (
+            <div className={`maps_bar_view maps_view ${!showTournamentInfo ? 'visible' : ''}`}>
+                <MapsList match={match} map={map} />
+            </div>
+        ) : null}
         {hasTournamentInfo ? (
             <div className={`maps_bar_view tournament_info ${showTournamentInfo ? 'visible' : ''}`}>
                 <div className="tournament_title">{tournamentTitle}</div>
