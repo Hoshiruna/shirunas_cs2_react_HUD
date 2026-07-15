@@ -27,12 +27,11 @@ const TeamLogo = ({
 
   const id = getTeamId(team);
   const { logo } = team;
-  // ${apiUrl}/teams/${id}/logo - Old way of getting the logo
   return (
     <div className={`logo ${"side" in team ? team.side : ""}`}>
       {logo && id ? (
         <img
-          src={`${apiUrl}/teams/logo/${id}`}
+          src={`${apiUrl}teams/logo/${id}`}
           width={width}
           height={height}
           alt={"Team logo"}
