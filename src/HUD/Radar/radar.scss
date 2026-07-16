@@ -53,11 +53,43 @@
 
   .bestof {
     width: 121px;
+    flex-shrink: 0;
     font-size: 16px;
     font-weight: 700;
     display: flex;
     align-items: center;
     justify-content: center;
+  }
+
+  .maps_marquee {
+    width: calc(100% - 121px);
+    min-width: 0;
+    height: 100%;
+    overflow: hidden;
+  }
+
+  .maps_marquee_track {
+    display: flex;
+    width: 100%;
+    height: 100%;
+    animation: radar-maps-scroll 8s linear infinite;
+    will-change: transform;
+  }
+
+  .maps_view:not(.visible) .maps_marquee_track {
+    animation-play-state: paused;
+  }
+
+  .maps_marquee_group {
+    display: flex;
+    flex-shrink: 0;
+    width: 100%;
+    height: 100%;
+
+    .veto_entry {
+      flex: 0 0 calc(100% / 3);
+      min-width: 0;
+    }
   }
 
   .tournament_info {
@@ -89,6 +121,22 @@
     }
   }
 }
+
+@keyframes radar-maps-scroll {
+  0%,
+  30% {
+    transform: translate3d(0, 0, 0);
+  }
+
+  99.9% {
+    transform: translate3d(-66.6667%, 0, 0);
+  }
+
+  100% {
+    transform: translate3d(0, 0, 0);
+  }
+}
+
 .veto_entry {
   display: flex;
   justify-content: center;

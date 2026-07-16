@@ -34,7 +34,7 @@ const TOURNAMENT_VIEW_MS = 4500;
 
     return (
         <div id={`radar_maps_container`} className={` ${showBig ? 'preview':''}`}>
-            {match ? <MapsBar match={match} map={map} game={game} /> : null}
+            {match ? <MapsBar match={match} map={map} /> : null}
             <Radar radarSize={showBig ? 600: radarSize} game={game} />
         </div>
     );
@@ -48,7 +48,8 @@ const MapsBar = ({ match, map }: MapsListProps) => {
     const tournamentTitle = displaySettings?.radar_tournament_title?.trim();
     const tournamentStage = displaySettings?.radar_tournament_stage?.trim();
     const hasTournamentInfo = Boolean(tournamentTitle || tournamentStage);
-    const hasMaps = match.vetos.length > 0;
+    const hasMaps = match.vetos.length > 0 || (match.matchType === "bo1" && Boolean(map.name));
+    const showTournamentFirst = match.matchType === "bo1";
 
     useEffect(() => {
         if (!hasTournamentInfo) {
@@ -70,11 +71,11 @@ const MapsBar = ({ match, map }: MapsListProps) => {
             }, showInfo ? MAPS_VIEW_MS : TOURNAMENT_VIEW_MS);
         };
 
-        setShowTournamentInfo(false);
-        scheduleNextView(true);
+        setShowTournamentInfo(showTournamentFirst);
+        scheduleNextView(!showTournamentFirst);
 
         return () => clearTimeout(timeoutId);
-    }, [hasMaps, hasTournamentInfo, tournamentStage, tournamentTitle]);
+    }, [hasMaps, hasTournamentInfo, showTournamentFirst, tournamentStage, tournamentTitle]);
 
     if (!hasMaps && !hasTournamentInfo) return '';
 
@@ -95,12 +96,31 @@ const MapsBar = ({ match, map }: MapsListProps) => {
 
 const MapsList = ({ match, map }: MapsListProps) => {
     const picks = match.vetos.filter(veto => veto.type !== "ban" && veto.mapName);
+    if (match.matchType === "bo1" && !picks.length) {
+        return <>
+            <div className="bestof">Best of 1</div>
+            <div className="veto_entry">
+                <div className="map_name active">{getMapDisplayName(map.name)}</div>
+            </div>
+        </>
+    }
     if (picks.length > 3) {
-        const current = picks.find(veto => map.name.includes(veto.mapName));
-        if (!current) return null;
+        const mapEntries = picks.map(veto => (
+            <MapEntry
+                key={veto.mapName}
+                veto={veto}
+                map={map}
+                team={veto.type === "decider" ? null : map.team_ct.id === veto.teamId ? map.team_ct : map.team_t}
+            />
+        ));
+
         return <>
             <div className="bestof">Best of {match.matchType.replace("bo", "")}</div>
-            {<MapEntry veto={current} map={map} team={current.type === "decider" ? null : map.team_ct.id === current.teamId ? map.team_ct : map.team_t} />}
+            <div className="maps_marquee">
+                <div className="maps_marquee_track">
+                    <div className="maps_marquee_group">{mapEntries}</div>
+                </div>
+            </div>
         </>
     }
     return <>
