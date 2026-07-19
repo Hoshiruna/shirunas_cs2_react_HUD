@@ -24,6 +24,18 @@ const App = () => {
             return;
           }
           setCurrentMatch(match);
+          let isReversed = false;
+          if (GSI.last) {
+            const mapName = GSI.last.map.name.substring(
+              GSI.last.map.name.lastIndexOf("/") + 1
+            );
+            const current = match.vetos.filter(
+              (veto) => veto.mapName === mapName
+            )[0];
+            if (current && current.reverseSide) {
+              isReversed = true;
+            }
+          }
           if (match.left.id) {
             api.teams.getTeam(match.left.id).then((left) => {
               const gsiTeamData = {
@@ -35,7 +47,9 @@ const App = () => {
                 extra: left.extra,
               };
 
-              GSI.teams.left = gsiTeamData;
+              if (!isReversed) {
+                GSI.teams.left = gsiTeamData;
+              } else GSI.teams.right = gsiTeamData;
             });
           }
           if (match.right.id) {
@@ -48,7 +62,8 @@ const App = () => {
                 map_score: match.right.wins,
                 extra: right.extra,
               };
-              GSI.teams.right = gsiTeamData;
+              if (!isReversed) GSI.teams.right = gsiTeamData;
+              else GSI.teams.left = gsiTeamData;
             });
           }
         })
