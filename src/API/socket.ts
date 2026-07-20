@@ -53,7 +53,7 @@ socket.on("readyToRegister", () => {
 });
 
 socket.on("hud_config", (data: any) => {
-  configs.save(data);
+  configs.saveLauncher(data);
 });
 
 socket.on("hud_action", (data: any) => {
