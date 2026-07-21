@@ -31,12 +31,14 @@ export class ConfigManager {
     data: { [K in string]?: any };
     private launcherData: { [K in string]?: any };
     private standaloneDisplaySettings: { [K in string]?: string } | null;
+    private standaloneUpperRightRotation: { [K in string]?: any } | null;
 
     constructor(){
         this.listeners = [];
         this.data = {};
         this.launcherData = {};
         this.standaloneDisplaySettings = null;
+        this.standaloneUpperRightRotation = null;
     }
     save(data: { [K in string]?: any }){
         this.saveLauncher(data);
@@ -47,8 +49,19 @@ export class ConfigManager {
         this.recompute();
     }
 
-    saveStandalone(displaySettings: { [K in string]?: string }){
+    saveStandalone(
+        displaySettings: { [K in string]?: string },
+        upperRightRotation?: { [K in string]?: any }
+    ){
         this.standaloneDisplaySettings = { ...displaySettings };
+        if (upperRightRotation) {
+            this.standaloneUpperRightRotation = {
+                ...upperRightRotation,
+                images: Array.isArray(upperRightRotation.images)
+                    ? upperRightRotation.images.map((image: any) => ({ ...image }))
+                    : [],
+            };
+        }
         this.recompute();
     }
 
@@ -62,6 +75,7 @@ export class ConfigManager {
         const hasDisplaySettings =
             Object.keys(launcherDisplaySettings).length > 0 ||
             this.standaloneDisplaySettings !== null;
+        const hasUpperRightRotation = this.standaloneUpperRightRotation !== null;
 
         this.data = {
             ...this.launcherData,
@@ -70,6 +84,16 @@ export class ConfigManager {
                     display_settings: {
                         ...launcherDisplaySettings,
                         ...(this.standaloneDisplaySettings || {}),
+                    },
+                }
+                : {}),
+            ...(hasUpperRightRotation
+                ? {
+                    upper_right_rotation: {
+                        ...this.standaloneUpperRightRotation,
+                        images: Array.isArray(this.standaloneUpperRightRotation?.images)
+                            ? this.standaloneUpperRightRotation.images.map((image: any) => ({ ...image }))
+                            : [],
                     },
                 }
                 : {}),

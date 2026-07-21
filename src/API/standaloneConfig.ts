@@ -12,13 +12,68 @@ const DISPLAY_SETTING_KEYS = [
 
 type StandaloneDisplaySettings = Record<(typeof DISPLAY_SETTING_KEYS)[number], string>;
 
+export interface StandaloneRotationImage {
+  image_url: string;
+  duration_seconds: number;
+}
+
+export interface StandaloneUpperRightRotation {
+  image_count: number;
+  images: StandaloneRotationImage[];
+}
+
 interface ConfigEnvelope {
   protocolVersion: number;
   revision: number;
   config: {
     display_settings: StandaloneDisplaySettings;
+    upper_right_rotation?: StandaloneUpperRightRotation;
   };
 }
+
+const readUpperRightRotation = (value: unknown): StandaloneUpperRightRotation | null => {
+  if (!value || typeof value !== "object" || Array.isArray(value)) return null;
+  const candidate = value as Record<string, unknown>;
+  if (
+    typeof candidate.image_count !== "number" ||
+    !Number.isInteger(candidate.image_count) ||
+    (candidate.image_count as number) < 0 ||
+    (candidate.image_count as number) > 10 ||
+    !Array.isArray(candidate.images) ||
+    candidate.images.length !== candidate.image_count
+  ) {
+    return null;
+  }
+
+  const images: StandaloneRotationImage[] = [];
+  for (const entry of candidate.images) {
+    if (!entry || typeof entry !== "object" || Array.isArray(entry)) return null;
+    const image = entry as Record<string, unknown>;
+    if (
+      typeof image.image_url !== "string" ||
+      image.image_url.length === 0 ||
+      image.image_url.length > 2048 ||
+      typeof image.duration_seconds !== "number" ||
+      !Number.isInteger(image.duration_seconds) ||
+      (image.duration_seconds as number) < 1 ||
+      (image.duration_seconds as number) > 3600
+    ) {
+      return null;
+    }
+    try {
+      const parsedUrl = new URL(image.image_url);
+      if (parsedUrl.protocol !== "http:" && parsedUrl.protocol !== "https:") return null;
+    } catch {
+      return null;
+    }
+    images.push({
+      image_url: image.image_url,
+      duration_seconds: image.duration_seconds as number,
+    });
+  }
+
+  return { image_count: candidate.image_count as number, images };
+};
 
 const readStandaloneSettings = (envelope: unknown): StandaloneDisplaySettings | null => {
   if (!envelope || typeof envelope !== "object" || Array.isArray(envelope)) return null;
@@ -88,8 +143,12 @@ standaloneConfigSocket.on("config:state", (envelope: unknown) => {
   const candidate = envelope as Partial<ConfigEnvelope> | null;
   const displaySettings = readStandaloneSettings(envelope);
   if (!displaySettings || typeof candidate?.revision !== "number") return;
+  const rotationValue = candidate.config?.upper_right_rotation;
+  const upperRightRotation =
+    rotationValue === undefined ? undefined : readUpperRightRotation(rotationValue);
+  if (rotationValue !== undefined && !upperRightRotation) return;
   if (candidate.revision < lastRevision) return;
 
   lastRevision = candidate.revision;
-  configs.saveStandalone(displaySettings);
+  configs.saveStandalone(displaySettings, upperRightRotation);
 });

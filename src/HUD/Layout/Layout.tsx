@@ -17,6 +17,7 @@ import { CSGO } from "csgogsi";
 import { Match } from "../../API/types";
 import { useAction } from "../../API/contexts/actions";
 import { getDisplayState } from "../displayState";
+import UpperRightRotation from "../UpperRightRotation/UpperRightRotation";
 interface Props {
   game: CSGO;
   match: Match | null;
@@ -47,6 +48,7 @@ const Layout = ({ game, match }: Props) => {
     game.phase_countdowns.phase === "freezetime";
   return (
     <div className="layout">
+      <UpperRightRotation />
       <Killfeed />
       {/* <Overview match={match} map={game.map} players={game.players || []} /> */}
       <RadarMaps match={match} map={game.map} game={game} />
