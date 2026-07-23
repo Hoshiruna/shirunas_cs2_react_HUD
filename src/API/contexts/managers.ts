@@ -75,7 +75,8 @@ export class ConfigManager {
         const hasDisplaySettings =
             Object.keys(launcherDisplaySettings).length > 0 ||
             this.standaloneDisplaySettings !== null;
-        const hasUpperRightRotation = this.standaloneUpperRightRotation !== null;
+        const standaloneUpperRightRotation = this.standaloneUpperRightRotation;
+        const hasUpperRightRotation = standaloneUpperRightRotation !== null;
 
         this.data = {
             ...this.launcherData,
@@ -90,9 +91,9 @@ export class ConfigManager {
             ...(hasUpperRightRotation
                 ? {
                     upper_right_rotation: {
-                        ...this.standaloneUpperRightRotation,
-                        images: Array.isArray(this.standaloneUpperRightRotation?.images)
-                            ? this.standaloneUpperRightRotation.images.map((image: any) => ({ ...image }))
+                        ...standaloneUpperRightRotation,
+                        images: Array.isArray(standaloneUpperRightRotation?.images)
+                            ? standaloneUpperRightRotation.images.map((image: any) => ({ ...image }))
                             : [],
                     },
                 }

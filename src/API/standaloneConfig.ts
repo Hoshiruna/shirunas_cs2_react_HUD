@@ -144,9 +144,12 @@ standaloneConfigSocket.on("config:state", (envelope: unknown) => {
   const displaySettings = readStandaloneSettings(envelope);
   if (!displaySettings || typeof candidate?.revision !== "number") return;
   const rotationValue = candidate.config?.upper_right_rotation;
-  const upperRightRotation =
-    rotationValue === undefined ? undefined : readUpperRightRotation(rotationValue);
-  if (rotationValue !== undefined && !upperRightRotation) return;
+  let upperRightRotation: StandaloneUpperRightRotation | undefined;
+  if (rotationValue !== undefined) {
+    const parsedRotation = readUpperRightRotation(rotationValue);
+    if (!parsedRotation) return;
+    upperRightRotation = parsedRotation;
+  }
   if (candidate.revision < lastRevision) return;
 
   lastRevision = candidate.revision;
