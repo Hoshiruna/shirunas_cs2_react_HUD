@@ -2,7 +2,7 @@ import { io } from "socket.io-client";
 import { configs } from "./contexts/actions";
 
 const PROTOCOL_VERSION = 1;
-const CONFIGURATOR_URL = "http://127.0.0.1:1350/ournotes-config";
+const CONFIGURATOR_URL = "http://127.0.0.1:1350/shirunas-hud-config";
 const DISPLAY_SETTING_KEYS = [
   "radar_tournament_title",
   "radar_tournament_stage",

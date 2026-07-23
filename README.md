@@ -1,11 +1,11 @@
 
 <p align="center">
-	<p align="center" style="font-weight:600; letter-spacing:1pt; font-size:20pt;">OURNOTES HUD</p>
+	<p align="center" style="font-weight:600; letter-spacing:1pt; font-size:20pt;">shirunas hud</p>
 	<p align="center"><img src="icon.png" alt="Logo" width="80" height="80"></p>
 	<p align="center" style="font-weight:400;">Powered by <strong>« Hoshiruna »</strong></a></p>
 </p>
 
-# Ournotes HUD
+# shirunas hud
 
   
 
