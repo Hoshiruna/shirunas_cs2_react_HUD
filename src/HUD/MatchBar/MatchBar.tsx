@@ -4,7 +4,11 @@ import TeamScore from "./TeamScore";
 import WinAnnouncement from "./WinIndicator";
 import BombTimer from "./../Timers/BombTimer";
 import { MAX_TIMER, useBombTimer } from "./../Timers/Countdown";
-import { C4 } from "../../assets/Icons";
+import {
+  BombExplosion,
+  C4,
+  c4_defused as C4Defused,
+} from "../../assets/Icons";
 import { Match } from "./../../API/types";
 import { getDisplayTeams } from "../displayState";
 import { CSSProperties, useEffect, useRef, useState } from "react";
@@ -89,10 +93,11 @@ const getSeriesWinsNeeded = (match: Match | null) => {
 };
 
 const Matchbar = (props: IProps) => {
-  const { bomb, match, map, phase } = props;
+  const { match, map, phase } = props;
   const [roundWinner, setRoundWinner] = useState<"left" | "right" | null>(null);
   const [roundWinnerExpanded, setRoundWinnerExpanded] = useState(false);
   const roundWinnerTimeout = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const bombCountdownStarted = useRef(false);
   const time = stringToClock(phase.phase_ends_in);
   const { left, right } = getDisplayTeams(map, match);
   const displaySettings = useConfig("display_settings") as
@@ -128,10 +133,28 @@ const Matchbar = (props: IProps) => {
 
   const bombData = useBombTimer();
   const isPlanting = bombData.state === "planting";
-  const isC4Active =
-    isPlanting ||
-    bombData.state === "planted" ||
-    bombData.state === "defusing";
+  const isBombCountdownActive =
+    bombData.state === "planted" || bombData.state === "defusing";
+
+  useEffect(() => {
+    if (isBombCountdownActive && bombData.bombTime > 0) {
+      bombCountdownStarted.current = true;
+    } else if (
+      !isBombCountdownActive &&
+      bombData.state !== "exploded"
+    ) {
+      bombCountdownStarted.current = false;
+    }
+  }, [bombData.bombTime, bombData.state, isBombCountdownActive]);
+
+  const isC4Defused = bombData.state === "defused";
+  const isC4Exploded =
+    bombData.state === "exploded" ||
+    (isBombCountdownActive &&
+      bombCountdownStarted.current &&
+      bombData.bombTime <= 0);
+  const isC4Active = isPlanting || isBombCountdownActive;
+  const shouldShowC4Icon = isC4Active || isC4Defused || isC4Exploded;
   const defuseTimer: Timer | null =
     bombData.state === "defusing"
       ? {
@@ -180,14 +203,25 @@ const Matchbar = (props: IProps) => {
           <div className={`score left ${left.side}`}>{left.score}</div>
         <div id="timer" className={bo === 0 ? "no-bo" : ""}>
           <div
-            className={`timer_c4_icon ${isC4Active ? "show" : "hide"}`}
+            className={`timer_c4_icon ${shouldShowC4Icon ? "show" : "hide"} ${
+              isC4Defused ? "defused" : isC4Exploded ? "exploded" : ""
+            }`}
           >
-            <C4 />
+            {isC4Defused ? (
+              <C4Defused />
+            ) : isC4Exploded ? (
+              <BombExplosion />
+            ) : (
+              <C4 />
+            )}
           </div>
-          <div id={`round_timer_text`} className={isC4Active ? "hide" : ""}>
+          <div
+            id={`round_timer_text`}
+            className={shouldShowC4Icon ? "hide" : ""}
+          >
             {time}
           </div>
-          <div id="round_now" className={isC4Active ? "hide" : ""}>
+          <div id="round_now" className={shouldShowC4Icon ? "hide" : ""}>
             {getRoundLabel(map.round)}
           </div>
         </div>

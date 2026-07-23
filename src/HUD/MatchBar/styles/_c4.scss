@@ -8,6 +8,14 @@
       justify-content: center;
       color: #ff2a2a;
 
+      &.defused {
+        color: var(--primary-light);
+      }
+
+      &.exploded {
+        color: #ff2a2a;
+      }
+
       &.show {
         display: flex;
       }

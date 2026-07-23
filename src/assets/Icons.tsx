@@ -10,6 +10,7 @@ import BombExplosion from "./../assets/images/icon_bomb_explosion_default.svg?re
 import Bullets from "./../assets/images/icon_bullets_default.svg?react";
 import Burning from "./../assets/images/icon_burning.svg?react";
 import C4 from "./../assets/images/icon_c4_default.svg?react";
+import C4Defused from "./../assets/images/icon_c4_defused_default.svg?react";
 import Defuse from "./../assets/images/icon_defuse_default.svg?react";
 import Health from "./../assets/images/icon_health_default.svg?react";
 import HealthFull from "./../assets/images/icon_health_full_default.svg?react";
@@ -50,6 +51,7 @@ export {
   Bullets,
   Burning,
   C4,
+  C4Defused as c4_defused,
   Defuse,
   Health,
   HealthFull,
